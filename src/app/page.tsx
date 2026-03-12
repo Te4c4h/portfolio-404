@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { HOME_USERNAME } from "@/lib/home-user";
 import PortfolioClient from "@/components/portfolio/PortfolioClient";
 
+export const dynamic = "force-dynamic";
+
 async function getHomeData() {
   const user = await prisma.user.findUnique({
     where: { username: HOME_USERNAME },
