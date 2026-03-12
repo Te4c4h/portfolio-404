@@ -16,60 +16,56 @@ import {
   FiMenu,
   FiX,
   FiExternalLink,
+  FiArrowLeft,
 } from "react-icons/fi";
 
-interface AdminSidebarProps {
+interface AdminHomeSidebarProps {
   username: string;
-  isAdmin?: boolean;
 }
 
-const userLinks = [
-  { href: "", label: "Dashboard", icon: FiHome },
-  { href: "/sections", label: "Sections", icon: FiLayers },
-  { href: "/content", label: "Sections Content", icon: FiGrid },
-  { href: "/site", label: "Site Content", icon: FiFileText },
-  { href: "/contact", label: "Contact Links", icon: FiLink },
-  { href: "/theme", label: "Theme", icon: FiDroplet },
+const homeLinks = [
+  { href: "/admin/home", label: "Dashboard", icon: FiHome },
+  { href: "/admin/home/sections", label: "Sections", icon: FiLayers },
+  { href: "/admin/home/content", label: "Sections Content", icon: FiGrid },
+  { href: "/admin/home/site", label: "Site Content", icon: FiFileText },
+  { href: "/admin/home/contact", label: "Contact Links", icon: FiLink },
+  { href: "/admin/home/theme", label: "Theme", icon: FiDroplet },
 ];
 
-export default function AdminSidebar({ username, isAdmin }: AdminSidebarProps) {
+export default function AdminHomeSidebar({ username }: AdminHomeSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const basePath = `/u/${username}/admin`;
-
-  const links = userLinks;
 
   const isActive = (href: string) => {
-    const full = basePath + href;
-    if (href === "") return pathname === basePath;
-    return pathname.startsWith(full);
+    if (href === "/admin/home") return pathname === "/admin/home";
+    return pathname.startsWith(href);
   };
 
   const sidebar = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-6">
         <h2 className="text-[#70E844] font-bold text-lg tracking-tight">
-          Admin Panel
+          Home Page
         </h2>
         <a
-          href={`/u/${username}`}
+          href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#70E844] transition-colors mt-1"
         >
           <FiExternalLink size={12} />
-          View Portfolio
+          View Home Page
         </a>
       </div>
 
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        {links.map((link) => {
+        {homeLinks.map((link) => {
           const Icon = link.icon;
           const active = isActive(link.href);
           return (
             <Link
               key={link.href}
-              href={basePath + link.href}
+              href={link.href}
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 active
@@ -82,35 +78,25 @@ export default function AdminSidebar({ username, isAdmin }: AdminSidebarProps) {
             </Link>
           );
         })}
-        {isAdmin && (
-          <>
-            <div className="my-3 border-t border-[#2a2a2a]" />
-            <Link
-              href="/admin/home"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                pathname.startsWith("/admin/home")
-                  ? "bg-[#70E844]/10 text-[#70E844]"
-                  : "text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08]"
-              }`}
-            >
-              <FiHome size={18} />
-              Home Page
-            </Link>
-            <Link
-              href="/admin"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                pathname === "/admin"
-                  ? "bg-[#70E844]/10 text-[#70E844]"
-                  : "text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08]"
-              }`}
-            >
-              <FiLayers size={18} />
-              Manage Users
-            </Link>
-          </>
-        )}
+
+        <div className="my-3 border-t border-[#2a2a2a]" />
+
+        <Link
+          href={`/u/${username}/admin`}
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08] transition-colors"
+        >
+          <FiArrowLeft size={18} />
+          My Dashboard
+        </Link>
+        <Link
+          href="/admin"
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08] transition-colors"
+        >
+          <FiLayers size={18} />
+          Manage Users
+        </Link>
       </nav>
 
       <div className="px-3 pb-6">

@@ -1,7 +1,70 @@
-export default function Home() {
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
+import { HOME_USERNAME } from "@/lib/home-user";
+import PortfolioClient from "@/components/portfolio/PortfolioClient";
+
+async function getHomeData() {
+  const user = await prisma.user.findUnique({
+    where: { username: HOME_USERNAME },
+    select: {
+      id: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      theme: true,
+      siteContent: true,
+      navLinks: { orderBy: { order: "asc" } },
+      contactLinks: { orderBy: { order: "asc" } },
+      sections: {
+        orderBy: { order: "asc" },
+        include: {
+          contentItems: { orderBy: { order: "asc" } },
+        },
+      },
+    },
+  });
+
+  return user;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getHomeData();
+  if (!data) return { title: "Portfolio 404" };
+
+  const title = data.siteContent?.siteTitle || "Portfolio 404";
+  const description = data.siteContent?.subtext || "Creative Portfolios, Instantly";
+  const ogImage = data.theme?.webclipUrl || undefined;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(ogImage && { images: [{ url: ogImage }] }),
+    },
+  };
+}
+
+export default async function HomePage() {
+  const data = await getHomeData();
+  if (!data) notFound();
+
+  const { theme, siteContent, navLinks, contactLinks, sections } = data;
+
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-2xl font-bold">Portfolio 404</h1>
-    </main>
+    <PortfolioClient
+      user={{
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+      }}
+      theme={theme}
+      siteContent={siteContent}
+      navLinks={navLinks}
+      contactLinks={contactLinks}
+      sections={sections}
+    />
   );
 }
