@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function CompleteSignupPage() {
+function CompleteSignupContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams.get("email") || "";
@@ -172,5 +172,13 @@ export default function CompleteSignupPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function CompleteSignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#131313] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#70E844] border-t-transparent rounded-full animate-spin" /></div>}>
+      <CompleteSignupContent />
+    </Suspense>
   );
 }
