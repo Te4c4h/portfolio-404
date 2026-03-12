@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     });
     if (existingEmail) {
       return NextResponse.json(
-        { error: "Email is already taken" },
+        { error: "An account with this email already exists." },
         { status: 409 }
       );
     }

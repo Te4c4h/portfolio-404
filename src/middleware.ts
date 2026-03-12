@@ -14,9 +14,6 @@ export async function middleware(req: NextRequest) {
   // Authenticated user visits /login → redirect to their dashboard
   if (pathname === "/login") {
     if (token) {
-      if (token.isAdmin) {
-        return NextResponse.redirect(new URL("/admin", req.url));
-      }
       return NextResponse.redirect(
         new URL(`/u/${token.username}/admin`, req.url)
       );

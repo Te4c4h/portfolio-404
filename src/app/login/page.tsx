@@ -169,11 +169,7 @@ export default function LoginPage() {
       const sessionRes = await fetch("/api/auth/session");
       const session = await sessionRes.json();
 
-      if (session?.user?.isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push(`/u/${session?.user?.username}/admin`);
-      }
+      router.push(`/u/${session?.user?.username}/admin`);
     } catch {
       setSignInError("Something went wrong");
       setSignInLoading(false);
