@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function GET(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const sectionId = req.nextUrl.searchParams.get("sectionId");
 
-  const where: { userId: string; sectionId?: string } = { userId: user.id };
+  const where: { userId: string; sectionId?: string } = { userId };
   if (sectionId) where.sectionId = sectionId;
 
   const items = await prisma.contentItem.findMany({
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { title, description, sectionId, tags, coverImage, image1, image2, image3, liveUrl, repoUrl } = body;
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (!sectionId) return NextResponse.json({ error: "Section is required" }, { status: 400 });
 
   const section = await prisma.section.findUnique({ where: { id: sectionId } });
-  if (!section || section.userId !== user.id) {
+  if (!section || section.userId !== userId) {
     return NextResponse.json({ error: "Section not found" }, { status: 404 });
   }
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
   const item = await prisma.contentItem.create({
     data: {
-      userId: user.id,
+      userId,
       sectionId,
       title,
       description: description || "",

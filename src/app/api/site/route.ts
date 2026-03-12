@@ -1,21 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function GET() {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const siteContent = await prisma.siteContent.findUnique({
-    where: { userId: user.id },
+    where: { userId },
   });
 
   return NextResponse.json(siteContent);
 }
 
 export async function PUT(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const {
@@ -26,7 +26,7 @@ export async function PUT(req: NextRequest) {
   } = body;
 
   const siteContent = await prisma.siteContent.upsert({
-    where: { userId: user.id },
+    where: { userId },
     update: {
       siteTitle: siteTitle ?? "",
       logoText: logoText ?? "",
@@ -45,7 +45,7 @@ export async function PUT(req: NextRequest) {
       loadingSubtitle: loadingSubtitle ?? "",
     },
     create: {
-      userId: user.id,
+      userId,
       siteTitle: siteTitle ?? "",
       logoText: logoText ?? "",
       headline: headline ?? "",

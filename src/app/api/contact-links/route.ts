@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function GET() {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const links = await prisma.contactLink.findMany({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { order: "asc" },
   });
 
@@ -15,8 +15,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { platform, url } = body;
@@ -25,14 +25,14 @@ export async function POST(req: NextRequest) {
   if (!url) return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
   const maxOrder = await prisma.contactLink.findFirst({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { order: "desc" },
     select: { order: true },
   });
 
   const link = await prisma.contactLink.create({
     data: {
-      userId: user.id,
+      userId,
       platform,
       url,
       order: (maxOrder?.order ?? -1) + 1,

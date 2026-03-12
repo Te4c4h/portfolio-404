@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const item = await prisma.contentItem.findUnique({ where: { id: params.id } });
-  if (!item || item.userId !== user.id) {
+  if (!item || item.userId !== userId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
@@ -41,11 +41,11 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const item = await prisma.contentItem.findUnique({ where: { id: params.id } });
-  if (!item || item.userId !== user.id) {
+  if (!item || item.userId !== userId) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

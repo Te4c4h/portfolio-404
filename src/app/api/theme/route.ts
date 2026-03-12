@@ -1,21 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function GET() {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const theme = await prisma.theme.findUnique({
-    where: { userId: user.id },
+    where: { userId },
   });
 
   return NextResponse.json(theme);
 }
 
 export async function PUT(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const {
@@ -41,9 +41,9 @@ export async function PUT(req: NextRequest) {
   };
 
   const theme = await prisma.theme.upsert({
-    where: { userId: user.id },
+    where: { userId },
     update: data,
-    create: { userId: user.id, ...data },
+    create: { userId, ...data },
   });
 
   return NextResponse.json(theme);

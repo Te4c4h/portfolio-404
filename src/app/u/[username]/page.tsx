@@ -1,9 +1,14 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { HOME_USERNAME } from "@/lib/home-user";
 import PortfolioClient from "@/components/portfolio/PortfolioClient";
 
+const BLOCKED_USERNAMES = [HOME_USERNAME, "admin"];
+
 async function getPortfolioData(username: string) {
+  if (BLOCKED_USERNAMES.includes(username)) return null;
+
   const user = await prisma.user.findUnique({
     where: { username },
     select: {

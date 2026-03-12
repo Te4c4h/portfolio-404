@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function GET() {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const sections = await prisma.section.findMany({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { order: "asc" },
   });
 
@@ -15,8 +15,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { name, label, subtitle, backgroundColor } = body;
@@ -31,21 +31,21 @@ export async function POST(req: NextRequest) {
     .replace(/^-|-$/g, "");
 
   const existing = await prisma.section.findUnique({
-    where: { userId_slug: { userId: user.id, slug } },
+    where: { userId_slug: { userId, slug } },
   });
   if (existing) {
     return NextResponse.json({ error: "A section with this name already exists" }, { status: 409 });
   }
 
   const maxOrder = await prisma.section.findFirst({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { order: "desc" },
     select: { order: true },
   });
 
   const section = await prisma.section.create({
     data: {
-      userId: user.id,
+      userId,
       name,
       slug,
       label: label || name,

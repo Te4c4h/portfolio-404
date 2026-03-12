@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { FiExternalLink } from "react-icons/fi";
 
 interface Stats {
@@ -14,6 +15,8 @@ interface Stats {
 export default function UserAdminPage() {
   const params = useParams();
   const username = params.username as string;
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.isAdmin;
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
@@ -28,13 +31,13 @@ export default function UserAdminPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#fafafa]">Dashboard</h1>
         <a
-          href={`/u/${username}`}
+          href={isAdmin ? "/" : `/u/${username}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[#70E844] text-[#131313] hover:bg-[#5ed636] transition-colors"
         >
           <FiExternalLink size={14} />
-          View Portfolio
+          {isAdmin ? "View Home Page" : "View Portfolio"}
         </a>
       </div>
 

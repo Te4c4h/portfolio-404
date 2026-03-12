@@ -51,15 +51,28 @@ export default function AdminSidebar({ username, isAdmin }: AdminSidebarProps) {
         <h2 className="text-[#70E844] font-bold text-lg tracking-tight">
           Admin Panel
         </h2>
-        <a
-          href={`/u/${username}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#70E844] transition-colors mt-1"
-        >
-          <FiExternalLink size={12} />
-          View Portfolio
-        </a>
+        {!isAdmin && (
+          <a
+            href={`/u/${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#70E844] transition-colors mt-1"
+          >
+            <FiExternalLink size={12} />
+            View Portfolio
+          </a>
+        )}
+        {isAdmin && (
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#70E844] transition-colors mt-1"
+          >
+            <FiExternalLink size={12} />
+            View Home Page
+          </a>
+        )}
       </div>
 
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
@@ -86,22 +99,10 @@ export default function AdminSidebar({ username, isAdmin }: AdminSidebarProps) {
           <>
             <div className="my-3 border-t border-[#2a2a2a]" />
             <Link
-              href="/admin/home"
+              href={`${basePath}/users`}
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                pathname.startsWith("/admin/home")
-                  ? "bg-[#70E844]/10 text-[#70E844]"
-                  : "text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08]"
-              }`}
-            >
-              <FiHome size={18} />
-              Home Page
-            </Link>
-            <Link
-              href="/admin"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                pathname === "/admin"
+                pathname.startsWith(`${basePath}/users`)
                   ? "bg-[#70E844]/10 text-[#70E844]"
                   : "text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08]"
               }`}

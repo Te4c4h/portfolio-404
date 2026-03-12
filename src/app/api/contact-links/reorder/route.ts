@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/api-auth";
+import { getEffectiveUserId } from "@/lib/api-auth";
 
 export async function PUT(req: NextRequest) {
-  const user = await requireAuth();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = await getEffectiveUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { items } = body as { items: { id: string; order: number }[] };
@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest) {
   await prisma.$transaction(
     items.map((item) =>
       prisma.contactLink.updateMany({
-        where: { id: item.id, userId: user.id },
+        where: { id: item.id, userId },
         data: { order: item.order },
       })
     )

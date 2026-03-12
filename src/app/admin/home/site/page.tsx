@@ -135,6 +135,8 @@ export default function AdminHomeSitePage() {
     { value: "#about", label: "About" },
     ...sections.map((s) => ({ value: `#${s.slug}`, label: s.name })),
     { value: "#contact", label: "Contact" },
+    { value: "/login", label: "Login / Sign Up page" },
+    { value: "/login#signup", label: "Sign Up page" },
   ];
 
   if (loading) return <div className="text-[#888] text-sm">Loading...</div>;

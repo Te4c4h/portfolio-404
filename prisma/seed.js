@@ -65,8 +65,7 @@ async function main() {
         },
       });
 
-      await tx.navLink.create({ data: { userId: homeUser.id, label: "Featured", href: "#featured", order: 0 } });
-      await tx.navLink.create({ data: { userId: homeUser.id, label: "Contact", href: "#contact", order: 1 } });
+      // No default nav links — admin adds them manually via the dashboard
     });
     console.log("__home__ user seeded successfully.");
   }
