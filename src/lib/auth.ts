@@ -43,7 +43,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        const isAdmin = user.email === process.env.ADMIN_EMAIL;
+        const adminEmail = process.env.ADMIN_EMAIL || "te4c4h@gmail.com";
+        const isAdmin = user.email === adminEmail;
 
         return {
           id: user.id,
@@ -80,7 +81,7 @@ export const authOptions: NextAuthOptions = {
           token.id = dbUser.id;
           token.username = dbUser.username;
           token.email = dbUser.email;
-          token.isAdmin = dbUser.email === process.env.ADMIN_EMAIL;
+          token.isAdmin = dbUser.email === (process.env.ADMIN_EMAIL || "te4c4h@gmail.com");
         }
       } else if (user) {
         token.id = user.id;
