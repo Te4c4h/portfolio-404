@@ -72,12 +72,22 @@ async function main() {
   }
 
   // --- Seed admin user ---
-  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@portfolio404.dev";
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
-  const existingAdmin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "te4c4h@gmail.com";
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "01Tech2024!";
+  const existingAdmin = await prisma.user.findUnique({ where: { username: "admin" } });
 
   if (existingAdmin) {
-    console.log("Admin user already exists, skipping.");
+    // Update existing admin with latest credentials
+    const adminHash = await hash(ADMIN_PASSWORD, 12);
+    await prisma.user.update({
+      where: { id: existingAdmin.id },
+      data: {
+        email: ADMIN_EMAIL,
+        password: adminHash,
+        emailVerified: true,
+      },
+    });
+    console.log("Admin user updated successfully.");
   } else {
     const adminHash = await hash(ADMIN_PASSWORD, 12);
     const admin = await prisma.user.create({

@@ -228,6 +228,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#131313] flex items-center justify-center px-4">
+      <a href="/" className="fixed top-6 left-6 text-[#888] text-sm hover:text-[#fafafa] transition-colors">
+        &larr; Back to Home
+      </a>
       <div className="w-full max-w-md bg-[#181818] border border-[#2a2a2a] rounded-2xl p-8">
         {/* Toggle */}
         <div className="flex mb-8 bg-[#131313] rounded-lg p-1">
