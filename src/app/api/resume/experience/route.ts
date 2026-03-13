@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/api-auth";
 
 async function getResumeId(userId: string): Promise<string | null> {
-  const resume = await (prisma as any).resume.findUnique({
+  const resume = await prisma.resume.findUnique({
     where: { userId },
     select: { id: true },
   });
@@ -20,13 +20,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { company, position, location, startDate, endDate, description } = body;
 
-  const maxOrder = await (prisma as any).resumeExperience.findFirst({
+  const maxOrder = await prisma.resumeExperience.findFirst({
     where: { resumeId },
     orderBy: { order: "desc" },
     select: { order: true },
   });
 
-  const exp = await (prisma as any).resumeExperience.create({
+  const exp = await prisma.resumeExperience.create({
     data: {
       resumeId,
       company: company || "",

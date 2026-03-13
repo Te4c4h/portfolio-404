@@ -16,7 +16,7 @@ export async function PUT(
   if (name !== undefined) data.name = name;
   if (level !== undefined) data.level = level;
 
-  const updated = await (prisma as any).resumeSkill.update({
+  const updated = await prisma.resumeSkill.update({
     where: { id: params.id },
     data,
   });
@@ -31,6 +31,6 @@ export async function DELETE(
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await (prisma as any).resumeSkill.delete({ where: { id: params.id } });
+  await prisma.resumeSkill.delete({ where: { id: params.id } });
   return NextResponse.json({ success: true });
 }

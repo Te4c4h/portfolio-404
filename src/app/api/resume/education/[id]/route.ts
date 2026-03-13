@@ -20,7 +20,7 @@ export async function PUT(
   if (endDate !== undefined) data.endDate = endDate;
   if (description !== undefined) data.description = description;
 
-  const updated = await (prisma as any).resumeEducation.update({
+  const updated = await prisma.resumeEducation.update({
     where: { id: params.id },
     data,
   });
@@ -35,6 +35,6 @@ export async function DELETE(
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await (prisma as any).resumeEducation.delete({ where: { id: params.id } });
+  await prisma.resumeEducation.delete({ where: { id: params.id } });
   return NextResponse.json({ success: true });
 }

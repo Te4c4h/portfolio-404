@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const resume = await (prisma as any).resume.findUnique({
+  const resume = await prisma.resume.findUnique({
     where: { userId: user.id },
     select: { id: true },
   });
@@ -15,13 +15,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { school, degree, field, startDate, endDate, description } = body;
 
-  const maxOrder = await (prisma as any).resumeEducation.findFirst({
+  const maxOrder = await prisma.resumeEducation.findFirst({
     where: { resumeId: resume.id },
     orderBy: { order: "desc" },
     select: { order: true },
   });
 
-  const edu = await (prisma as any).resumeEducation.create({
+  const edu = await prisma.resumeEducation.create({
     data: {
       resumeId: resume.id,
       school: school || "",

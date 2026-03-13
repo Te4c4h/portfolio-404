@@ -6,7 +6,7 @@ export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let resume = await (prisma as any).resume.findUnique({
+  let resume = await prisma.resume.findUnique({
     where: { userId: user.id },
     include: {
       experiences: { orderBy: { order: "asc" } },
@@ -16,7 +16,7 @@ export async function GET() {
   });
 
   if (!resume) {
-    resume = await (prisma as any).resume.create({
+    resume = await prisma.resume.create({
       data: {
         userId: user.id,
         fullName: `${user.username}`,
@@ -39,7 +39,7 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
   const { templateId, fullName, jobTitle, email, phone, location, website, summary, showOnPortfolio } = body;
 
-  const resume = await (prisma as any).resume.upsert({
+  const resume = await prisma.resume.upsert({
     where: { userId: user.id },
     update: {
       templateId: templateId ?? "classic",

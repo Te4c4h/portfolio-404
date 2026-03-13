@@ -20,7 +20,7 @@ export async function PUT(
   if (endDate !== undefined) data.endDate = endDate;
   if (description !== undefined) data.description = description;
 
-  const updated = await (prisma as any).resumeExperience.update({
+  const updated = await prisma.resumeExperience.update({
     where: { id: params.id },
     data,
   });
@@ -35,6 +35,6 @@ export async function DELETE(
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await (prisma as any).resumeExperience.delete({ where: { id: params.id } });
+  await prisma.resumeExperience.delete({ where: { id: params.id } });
   return NextResponse.json({ success: true });
 }
