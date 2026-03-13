@@ -28,6 +28,7 @@ model User {
   navLinks     NavLink[]
   contactLinks ContactLink[]
   theme        Theme?
+  resume       Resume?
 }
 
 model Section {
@@ -131,4 +132,62 @@ model Theme {
   gridColor      String @default("rgba(255,255,255,0.03)")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Resume {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  templateId      String   @default("classic")
+  fullName        String   @default("")
+  jobTitle        String   @default("")
+  email           String   @default("")
+  phone           String   @default("")
+  location        String   @default("")
+  website         String   @default("")
+  summary         String   @default("")
+  showOnPortfolio Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experiences ResumeExperience[]
+  educations  ResumeEducation[]
+  skills      ResumeSkill[]
+}
+
+model ResumeExperience {
+  id          String  @id @default(cuid())
+  resumeId    String
+  company     String  @default("")
+  position    String  @default("")
+  location    String  @default("")
+  startDate   String  @default("")
+  endDate     String  @default("")
+  description String  @default("")
+  order       Int     @default(0)
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+}
+
+model ResumeEducation {
+  id          String  @id @default(cuid())
+  resumeId    String
+  school      String  @default("")
+  degree      String  @default("")
+  field       String  @default("")
+  startDate   String  @default("")
+  endDate     String  @default("")
+  description String  @default("")
+  order       Int     @default(0)
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+}
+
+model ResumeSkill {
+  id       String @id @default(cuid())
+  resumeId String
+  name     String @default("")
+  level    String @default("")
+  order    Int    @default(0)
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
 }

@@ -1,0 +1,38 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getSessionUser } from "@/lib/api-auth";
+
+export async function POST(req: NextRequest) {
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const resume = await (prisma as any).resume.findUnique({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+  if (!resume) return NextResponse.json({ error: "Resume not found" }, { status: 404 });
+
+  const body = await req.json();
+  const { school, degree, field, startDate, endDate, description } = body;
+
+  const maxOrder = await (prisma as any).resumeEducation.findFirst({
+    where: { resumeId: resume.id },
+    orderBy: { order: "desc" },
+    select: { order: true },
+  });
+
+  const edu = await (prisma as any).resumeEducation.create({
+    data: {
+      resumeId: resume.id,
+      school: school || "",
+      degree: degree || "",
+      field: field || "",
+      startDate: startDate || "",
+      endDate: endDate || "",
+      description: description || "",
+      order: (maxOrder?.order ?? -1) + 1,
+    },
+  });
+
+  return NextResponse.json(edu, { status: 201 });
+}

@@ -12,6 +12,15 @@ export async function DELETE() {
   }
 
   // Delete all user data and the user in a transaction
+  // Delete resume sub-items first (cascade from resume)
+  const resume = await (prisma as any).resume.findUnique({ where: { userId: user.id }, select: { id: true } });
+  if (resume) {
+    await (prisma as any).resumeExperience.deleteMany({ where: { resumeId: resume.id } });
+    await (prisma as any).resumeEducation.deleteMany({ where: { resumeId: resume.id } });
+    await (prisma as any).resumeSkill.deleteMany({ where: { resumeId: resume.id } });
+    await (prisma as any).resume.delete({ where: { id: resume.id } });
+  }
+
   await prisma.$transaction([
     prisma.contactLink.deleteMany({ where: { userId: user.id } }),
     prisma.navLink.deleteMany({ where: { userId: user.id } }),

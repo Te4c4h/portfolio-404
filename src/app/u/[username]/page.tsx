@@ -34,7 +34,18 @@ async function getPortfolioData(username: string) {
   });
 
   if (!user || user.isBlocked || !user.isPublished) return null;
-  return user;
+
+  // Fetch resume if showOnPortfolio is enabled
+  const resume = await (prisma as any).resume.findUnique({
+    where: { userId: user.id },
+    include: {
+      experiences: { orderBy: { order: "asc" } },
+      educations: { orderBy: { order: "asc" } },
+      skills: { orderBy: { order: "asc" } },
+    },
+  });
+
+  return { ...user, resume: resume?.showOnPortfolio ? resume : null };
 }
 
 export async function generateMetadata({
@@ -81,7 +92,7 @@ export default async function PortfolioPage({
   const data = await getPortfolioData(params.username);
   if (!data) notFound();
 
-  const { theme, siteContent, navLinks, contactLinks, sections } = data;
+  const { theme, siteContent, navLinks, contactLinks, sections, resume } = data;
 
   return (
     <PortfolioClient
@@ -95,6 +106,7 @@ export default async function PortfolioPage({
       navLinks={navLinks}
       contactLinks={contactLinks}
       sections={sections}
+      resume={resume}
     />
   );
 }

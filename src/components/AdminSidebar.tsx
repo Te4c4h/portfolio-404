@@ -30,6 +30,7 @@ const userLinks = [
   { href: "/site", label: "Site Content", icon: FiFileText },
   { href: "/contact", label: "Contact Links", icon: FiLink },
   { href: "/theme", label: "Theme", icon: FiDroplet },
+  { href: "/resume", label: "Resume", icon: FiFileText },
 ];
 
 export default function AdminSidebar({ username, isAdmin }: AdminSidebarProps) {

@@ -10,6 +10,7 @@ import SectionBlock from "./SectionBlock";
 import Contact from "./Contact";
 import Footer from "./Footer";
 import ProjectModal from "./ProjectModal";
+import ResumeSection, { ResumeData } from "./ResumeSection";
 
 export interface ThemeData {
   accentColor: string;
@@ -92,6 +93,7 @@ interface PortfolioClientProps {
   navLinks: NavLinkData[];
   contactLinks: ContactLinkData[];
   sections: SectionData[];
+  resume?: ResumeData | null;
 }
 
 const defaults: ThemeData = {
@@ -108,7 +110,7 @@ function googleFontUrl(fonts: string[]): string {
 }
 
 export default function PortfolioClient({
-  user, theme: rawTheme, siteContent, navLinks, contactLinks, sections,
+  user, theme: rawTheme, siteContent, navLinks, contactLinks, sections, resume,
 }: PortfolioClientProps) {
   const theme = { ...defaults, ...Object.fromEntries(
     Object.entries(rawTheme || {}).filter(([, v]) => v !== null && v !== "")
@@ -202,6 +204,13 @@ export default function PortfolioClient({
               onCardClick={setModalItem}
             />
           ))}
+          {resume && (
+            <ResumeSection
+              resume={resume}
+              accent={theme.accentColor}
+              surface={theme.surfaceColor}
+            />
+          )}
           <Contact
             title={siteContent?.contactTitle || "Get in Touch"}
             subtitle={siteContent?.contactSubtitle || ""}
