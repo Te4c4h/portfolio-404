@@ -61,7 +61,8 @@ export default function ManageUsersPage() {
         <h1 className="text-2xl font-bold text-[#fafafa]">Manage Users</h1>
       </div>
 
-      <div className="bg-[#181818] border border-[#2a2a2a] rounded-xl overflow-hidden">
+      {/* Desktop table */}
+      <div className="hidden md:block bg-[#181818] border border-[#2a2a2a] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#2a2a2a]">
@@ -100,7 +101,7 @@ export default function ManageUsersPage() {
                 <td className="px-4 py-3 text-right">
                   {deletingId === user.id ? (
                     <div className="flex items-center justify-end gap-2">
-                      <span className="text-[#FE454E] text-xs">Are you sure? This will permanently delete the user and all their data.</span>
+                      <span className="text-[#FE454E] text-xs">Are you sure?</span>
                       <button onClick={() => deleteUser(user.id)} className="px-3 py-1 rounded text-xs bg-[#FE454E] text-white hover:bg-[#e03d45]">Delete</button>
                       <button onClick={() => setDeletingId(null)} className="px-3 py-1 rounded text-xs bg-[#2a2a2a] text-[#fafafa] hover:bg-[#333]">Cancel</button>
                     </div>
@@ -130,6 +131,64 @@ export default function ManageUsersPage() {
         {users.length === 0 && (
           <p className="text-[#666] text-sm text-center py-12">No users found.</p>
         )}
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {users.length === 0 && (
+          <p className="text-[#666] text-sm text-center py-12">No users found.</p>
+        )}
+        {users.map((user) => (
+          <div key={user.id} className="bg-[#181818] border border-[#2a2a2a] rounded-xl p-4 space-y-3">
+            <div className="flex items-start justify-between">
+              <div className="min-w-0">
+                <p className="text-[#fafafa] font-medium text-sm">{user.firstName} {user.lastName}</p>
+                <Link href={`/u/${user.username}`} className="text-[#70E844] text-xs hover:underline" target="_blank">
+                  @{user.username}
+                </Link>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                user.isBlocked
+                  ? "bg-[#FE454E]/15 text-[#FE454E]"
+                  : "bg-[#70E844]/15 text-[#70E844]"
+              }`}>
+                {user.isBlocked ? "Blocked" : "Active"}
+              </span>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[#888] text-xs truncate">{user.email}</p>
+              <p className="text-[#555] text-xs">
+                Joined {new Date(user.registeredAt).toLocaleDateString("en-US", {
+                  month: "short", day: "numeric", year: "numeric",
+                })}
+              </p>
+            </div>
+            {deletingId === user.id ? (
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-[#FE454E] text-xs flex-1">Delete this user?</span>
+                <button onClick={() => deleteUser(user.id)} className="px-3 py-1.5 rounded text-xs bg-[#FE454E] text-white hover:bg-[#e03d45]">Confirm</button>
+                <button onClick={() => setDeletingId(null)} className="px-3 py-1.5 rounded text-xs bg-[#2a2a2a] text-[#fafafa] hover:bg-[#333]">Cancel</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  onClick={() => toggleBlock(user.id)}
+                  disabled={togglingId === user.id}
+                  className={`px-3 py-1.5 rounded text-xs transition-colors ${
+                    user.isBlocked
+                      ? "bg-[#70E844]/15 text-[#70E844] hover:bg-[#70E844]/25"
+                      : "bg-[#FE454E]/15 text-[#FE454E] hover:bg-[#FE454E]/25"
+                  }`}
+                >
+                  {user.isBlocked ? "Unblock" : "Block"}
+                </button>
+                <button onClick={() => setDeletingId(user.id)} className="px-3 py-1.5 rounded text-xs bg-[#2a2a2a] text-[#888] hover:text-[#FE454E] hover:bg-[#FE454E]/10">
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ model User {
   verificationToken String?
   resetToken        String?
   resetTokenExpiry  DateTime?
+  isPublished       Boolean   @default(false)
 
   sections     Section[]
   contentItems ContentItem[]

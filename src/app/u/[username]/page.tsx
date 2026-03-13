@@ -19,6 +19,7 @@ async function getPortfolioData(username: string) {
       firstName: true,
       lastName: true,
       isBlocked: true,
+      isPublished: true,
       theme: true,
       siteContent: true,
       navLinks: { orderBy: { order: "asc" } },
@@ -32,7 +33,7 @@ async function getPortfolioData(username: string) {
     },
   });
 
-  if (!user || user.isBlocked) return null;
+  if (!user || user.isBlocked || !user.isPublished) return null;
   return user;
 }
 

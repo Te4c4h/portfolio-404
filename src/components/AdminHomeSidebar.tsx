@@ -90,7 +90,7 @@ export default function AdminHomeSidebar({ username }: AdminHomeSidebarProps) {
           My Dashboard
         </Link>
         <Link
-          href="/admin"
+          href={`/u/${username}/admin/users`}
           onClick={() => setOpen(false)}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08] transition-colors"
         >

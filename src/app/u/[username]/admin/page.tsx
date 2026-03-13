@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { FiExternalLink } from "react-icons/fi";
@@ -18,6 +18,8 @@ export default function UserAdminPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.isAdmin;
   const [stats, setStats] = useState<Stats | null>(null);
+  const [isPublished, setIsPublished] = useState<boolean | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     fetch("/api/dashboard/stats")
@@ -26,19 +28,65 @@ export default function UserAdminPage() {
       .catch(() => {});
   }, []);
 
+  const loadPublishStatus = useCallback(async () => {
+    const r = await fetch("/api/user/publish");
+    if (r.ok) {
+      const data = await r.json();
+      setIsPublished(data.isPublished);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin) loadPublishStatus();
+  }, [isAdmin, loadPublishStatus]);
+
+  const togglePublish = async () => {
+    setPublishing(true);
+    const r = await fetch("/api/user/publish", { method: "PUT" });
+    if (r.ok) {
+      const data = await r.json();
+      setIsPublished(data.isPublished);
+    }
+    setPublishing(false);
+  };
+
   return (
     <div className="max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-[#fafafa]">Dashboard</h1>
-        <a
-          href={isAdmin ? "/" : `/u/${username}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[#70E844] text-[#131313] hover:bg-[#5ed636] transition-colors"
-        >
-          <FiExternalLink size={14} />
-          {isAdmin ? "View Home Page" : "View Portfolio"}
-        </a>
+        <div className="flex items-center gap-2">
+          {!isAdmin && isPublished !== null && (
+            <button
+              onClick={togglePublish}
+              disabled={publishing}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                isPublished
+                  ? "bg-[#2a2a2a] text-[#888] hover:text-[#FE454E] hover:bg-[#FE454E]/10"
+                  : "bg-[#70E844] text-[#131313] hover:bg-[#5ed636]"
+              }`}
+            >
+              {publishing ? "..." : isPublished ? "Unpublish" : "Publish"}
+            </button>
+          )}
+          {!isAdmin && isPublished !== null && (
+            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+              isPublished
+                ? "bg-[#70E844]/15 text-[#70E844]"
+                : "bg-[#888]/15 text-[#888]"
+            }`}>
+              {isPublished ? "Live" : "Draft"}
+            </span>
+          )}
+          <a
+            href={isAdmin ? "/" : `/u/${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[#70E844] text-[#131313] hover:bg-[#5ed636] transition-colors"
+          >
+            <FiExternalLink size={14} />
+            {isAdmin ? "View Home Page" : "View Portfolio"}
+          </a>
+        </div>
       </div>
 
       {/* Stat Cards */}
