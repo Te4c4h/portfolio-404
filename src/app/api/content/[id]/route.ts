@@ -15,7 +15,7 @@ export async function PUT(
   }
 
   const body = await req.json();
-  const { title, description, tags, coverImage, image1, image2, image3, liveUrl, repoUrl, sectionId } = body;
+  const { title, description, tags, coverImage, image1, image2, image3, liveUrl, repoUrl, sectionId, contentType, videoUrl, codeContent, codeLanguage, modelUrl } = body;
 
   const data: Record<string, string> = {};
   if (title !== undefined) data.title = title;
@@ -28,6 +28,11 @@ export async function PUT(
   if (liveUrl !== undefined) data.liveUrl = liveUrl;
   if (repoUrl !== undefined) data.repoUrl = repoUrl;
   if (sectionId !== undefined) data.sectionId = sectionId;
+  if (contentType !== undefined) data.contentType = contentType;
+  if (videoUrl !== undefined) data.videoUrl = videoUrl;
+  if (codeContent !== undefined) data.codeContent = codeContent;
+  if (codeLanguage !== undefined) data.codeLanguage = codeLanguage;
+  if (modelUrl !== undefined) data.modelUrl = modelUrl;
 
   const updated = await prisma.contentItem.update({
     where: { id: params.id },

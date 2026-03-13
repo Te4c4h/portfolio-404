@@ -47,19 +47,24 @@ model Section {
 }
 
 model ContentItem {
-  id          String  @id @default(cuid())
-  userId      String
-  sectionId   String
-  title       String
-  description String  @default("")
-  tags        String  @default("")
-  coverImage  String  @default("")
-  image1      String  @default("")
-  image2      String  @default("")
-  image3      String  @default("")
-  liveUrl     String  @default("")
-  repoUrl     String  @default("")
-  order       Int     @default(0)
+  id            String  @id @default(cuid())
+  userId        String
+  sectionId     String
+  contentType   String  @default("project")
+  title         String
+  description   String  @default("")
+  tags          String  @default("")
+  coverImage    String  @default("")
+  image1        String  @default("")
+  image2        String  @default("")
+  image3        String  @default("")
+  liveUrl       String  @default("")
+  repoUrl       String  @default("")
+  videoUrl      String  @default("")
+  codeContent   String  @default("")
+  codeLanguage  String  @default("")
+  modelUrl      String  @default("")
+  order         Int     @default(0)
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)

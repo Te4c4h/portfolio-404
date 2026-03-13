@@ -26,10 +26,9 @@ export async function POST(req: NextRequest) {
   if (!homeUserId) return NextResponse.json({ error: "Home user not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, tags, coverImage, image1, image2, image3, liveUrl, repoUrl, sectionId } = body;
+  const { title, description, tags, coverImage, image1, image2, image3, liveUrl, repoUrl, sectionId, contentType, videoUrl, codeContent, codeLanguage, modelUrl } = body;
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
-  if (!description) return NextResponse.json({ error: "Description is required" }, { status: 400 });
   if (!sectionId) return NextResponse.json({ error: "Section is required" }, { status: 400 });
 
   const maxOrder = await prisma.contentItem.findFirst({
@@ -42,6 +41,7 @@ export async function POST(req: NextRequest) {
     data: {
       userId: homeUserId,
       sectionId,
+      contentType: contentType || "project",
       title,
       description: description || "",
       tags: tags || "",
@@ -51,6 +51,10 @@ export async function POST(req: NextRequest) {
       image3: image3 || "",
       liveUrl: liveUrl || "",
       repoUrl: repoUrl || "",
+      videoUrl: videoUrl || "",
+      codeContent: codeContent || "",
+      codeLanguage: codeLanguage || "",
+      modelUrl: modelUrl || "",
       order: (maxOrder?.order ?? -1) + 1,
     },
   });

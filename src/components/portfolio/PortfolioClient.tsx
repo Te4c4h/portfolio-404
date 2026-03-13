@@ -59,6 +59,7 @@ export interface ContactLinkData {
 
 export interface ContentItemData {
   id: string;
+  contentType: string;
   title: string;
   description: string;
   tags: string;
@@ -68,6 +69,10 @@ export interface ContentItemData {
   image3: string;
   liveUrl: string;
   repoUrl: string;
+  videoUrl: string;
+  codeContent: string;
+  codeLanguage: string;
+  modelUrl: string;
 }
 
 export interface SectionData {

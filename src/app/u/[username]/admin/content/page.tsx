@@ -18,6 +18,7 @@ interface Section {
 interface ContentItem {
   id: string;
   sectionId: string;
+  contentType: string;
   title: string;
   description: string;
   tags: string;
@@ -27,11 +28,16 @@ interface ContentItem {
   image3: string;
   liveUrl: string;
   repoUrl: string;
+  videoUrl: string;
+  codeContent: string;
+  codeLanguage: string;
+  modelUrl: string;
   order: number;
 }
 
 interface FormData {
   sectionId: string;
+  contentType: string;
   title: string;
   description: string;
   tags: string;
@@ -41,13 +47,31 @@ interface FormData {
   image3: string;
   liveUrl: string;
   repoUrl: string;
+  videoUrl: string;
+  codeContent: string;
+  codeLanguage: string;
+  modelUrl: string;
 }
 
 const emptyForm: FormData = {
-  sectionId: "", title: "", description: "", tags: "",
+  sectionId: "", contentType: "project", title: "", description: "", tags: "",
   coverImage: "", image1: "", image2: "", image3: "",
-  liveUrl: "", repoUrl: "",
+  liveUrl: "", repoUrl: "", videoUrl: "", codeContent: "",
+  codeLanguage: "", modelUrl: "",
 };
+
+const contentTypes = [
+  { value: "project", label: "Project" },
+  { value: "video", label: "Video" },
+  { value: "code", label: "Code Block" },
+  { value: "model3d", label: "3D Model" },
+];
+
+const codeLanguages = [
+  "javascript", "typescript", "python", "java", "c", "cpp", "csharp",
+  "go", "rust", "ruby", "php", "swift", "kotlin", "html", "css",
+  "sql", "bash", "json", "yaml", "markdown",
+];
 
 function SortableRow({
   item, sectionName, onEdit, onDelete, deletingId, setDeletingId,
@@ -144,10 +168,13 @@ export default function ContentPage() {
   const openEdit = (item: ContentItem) => {
     setEditingId(item.id);
     setForm({
-      sectionId: item.sectionId, title: item.title, description: item.description,
+      sectionId: item.sectionId, contentType: item.contentType || "project",
+      title: item.title, description: item.description,
       tags: item.tags, coverImage: item.coverImage, image1: item.image1,
       image2: item.image2, image3: item.image3, liveUrl: item.liveUrl,
-      repoUrl: item.repoUrl,
+      repoUrl: item.repoUrl, videoUrl: item.videoUrl || "",
+      codeContent: item.codeContent || "", codeLanguage: item.codeLanguage || "",
+      modelUrl: item.modelUrl || "",
     });
     setError("");
     setModalOpen(true);
@@ -156,7 +183,7 @@ export default function ContentPage() {
   const handleSave = async () => {
     if (!form.sectionId) { setError("Section is required"); return; }
     if (!form.title.trim()) { setError("Title is required"); return; }
-    if (!form.description.trim()) { setError("Description is required"); return; }
+    if (form.contentType === "project" && !form.description.trim()) { setError("Description is required"); return; }
     setSaving(true);
     setError("");
 
@@ -314,79 +341,129 @@ export default function ContentPage() {
             </h2>
 
             <div className="space-y-3">
-              <div>
-                <label className="text-xs text-[#888] mb-1 block">Section *</label>
-                <select className="dash-input" value={form.sectionId} onChange={(e) => setForm((f) => ({ ...f, sectionId: e.target.value }))}>
-                  <option value="">Select section</option>
-                  {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-                <p className="text-[#555] text-[10px] mt-0.5">Which section this content belongs to</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-[#888] mb-1 block">Section *</label>
+                  <select className="dash-input" value={form.sectionId} onChange={(e) => setForm((f) => ({ ...f, sectionId: e.target.value }))}>
+                    <option value="">Select section</option>
+                    {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-[#888] mb-1 block">Type *</label>
+                  <select className="dash-input" value={form.contentType} onChange={(e) => setForm((f) => ({ ...f, contentType: e.target.value }))}>
+                    {contentTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="text-xs text-[#888] mb-1 block">Title *</label>
-                <input className="dash-input" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Project title" />
-                <p className="text-[#555] text-[10px] mt-0.5">Max ~60 characters recommended</p>
+                <input className="dash-input" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Content title" />
               </div>
               <div>
-                <label className="text-xs text-[#888] mb-1 block">Description *</label>
-                <textarea className="dash-input min-h-[80px]" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Project description" />
-                <p className="text-[#555] text-[10px] mt-0.5">Supports multiple lines. Shown in the project modal.</p>
+                <label className="text-xs text-[#888] mb-1 block">Description{form.contentType === "project" ? " *" : ""}</label>
+                <textarea className="dash-input min-h-[80px]" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Description" />
               </div>
               <div>
                 <label className="text-xs text-[#888] mb-1 block">Tags</label>
                 <input className="dash-input" value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="React, Next.js, TypeScript" />
-                <p className="text-[#555] text-[10px] mt-0.5">Displayed as badges on the project card</p>
               </div>
-              <div>
-                <label className="text-xs text-[#888] mb-1 block">Cover Image URL</label>
-                <input className="dash-input" value={form.coverImage} onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))} placeholder="https://..." />
-                <p className="text-[#555] text-[10px] mt-0.5">Recommended: 1200x675px (16:9)</p>
-                {form.coverImage && (
-                  <div className="mt-2 rounded-lg overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
-                    <img src={form.coverImage} alt="Cover preview" className="w-full h-32 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+
+              {/* Video fields */}
+              {form.contentType === "video" && (
+                <div>
+                  <label className="text-xs text-[#888] mb-1 block">Video URL *</label>
+                  <input className="dash-input" value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))} placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..." />
+                  <p className="text-[#555] text-[10px] mt-0.5">YouTube or Vimeo URL. Will be embedded as a player.</p>
+                </div>
+              )}
+
+              {/* Code fields */}
+              {form.contentType === "code" && (
+                <>
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Language</label>
+                    <select className="dash-input" value={form.codeLanguage} onChange={(e) => setForm((f) => ({ ...f, codeLanguage: e.target.value }))}>
+                      <option value="">Auto-detect</option>
+                      {codeLanguages.map((l) => <option key={l} value={l}>{l}</option>)}
+                    </select>
                   </div>
-                )}
-              </div>
-              <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Code *</label>
+                    <textarea
+                      className="dash-input min-h-[160px] font-mono text-xs"
+                      value={form.codeContent}
+                      onChange={(e) => setForm((f) => ({ ...f, codeContent: e.target.value }))}
+                      placeholder="Paste your code here..."
+                      spellCheck={false}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* 3D Model fields */}
+              {form.contentType === "model3d" && (
                 <div>
-                  <label className="text-xs text-[#888] mb-1 block">Image 2</label>
-                  <input className="dash-input" value={form.image1} onChange={(e) => setForm((f) => ({ ...f, image1: e.target.value }))} placeholder="URL" />
-                  {form.image1 && (
-                    <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
-                      <img src={form.image1} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  <label className="text-xs text-[#888] mb-1 block">3D Model URL *</label>
+                  <input className="dash-input" value={form.modelUrl} onChange={(e) => setForm((f) => ({ ...f, modelUrl: e.target.value }))} placeholder="https://... (.glb or .gltf)" />
+                  <p className="text-[#555] text-[10px] mt-0.5">URL to a .glb or .gltf file. Will render as an interactive 3D viewer.</p>
+                </div>
+              )}
+
+              {/* Project-specific fields */}
+              {form.contentType === "project" && (
+                <>
+                  <div>
+                    <label className="text-xs text-[#888] mb-1 block">Cover Image URL</label>
+                    <input className="dash-input" value={form.coverImage} onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))} placeholder="https://..." />
+                    <p className="text-[#555] text-[10px] mt-0.5">Recommended: 1200x675px (16:9)</p>
+                    {form.coverImage && (
+                      <div className="mt-2 rounded-lg overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
+                        <img src={form.coverImage} alt="Cover preview" className="w-full h-32 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-xs text-[#888] mb-1 block">Image 2</label>
+                      <input className="dash-input" value={form.image1} onChange={(e) => setForm((f) => ({ ...f, image1: e.target.value }))} placeholder="URL" />
+                      {form.image1 && (
+                        <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
+                          <img src={form.image1} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div>
-                  <label className="text-xs text-[#888] mb-1 block">Image 3</label>
-                  <input className="dash-input" value={form.image2} onChange={(e) => setForm((f) => ({ ...f, image2: e.target.value }))} placeholder="URL" />
-                  {form.image2 && (
-                    <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
-                      <img src={form.image2} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                    <div>
+                      <label className="text-xs text-[#888] mb-1 block">Image 3</label>
+                      <input className="dash-input" value={form.image2} onChange={(e) => setForm((f) => ({ ...f, image2: e.target.value }))} placeholder="URL" />
+                      {form.image2 && (
+                        <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
+                          <img src={form.image2} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div>
-                  <label className="text-xs text-[#888] mb-1 block">Image 4</label>
-                  <input className="dash-input" value={form.image3} onChange={(e) => setForm((f) => ({ ...f, image3: e.target.value }))} placeholder="URL" />
-                  {form.image3 && (
-                    <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
-                      <img src={form.image3} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                    <div>
+                      <label className="text-xs text-[#888] mb-1 block">Image 4</label>
+                      <input className="dash-input" value={form.image3} onChange={(e) => setForm((f) => ({ ...f, image3: e.target.value }))} placeholder="URL" />
+                      {form.image3 && (
+                        <div className="mt-1 rounded overflow-hidden border border-[#2a2a2a] bg-[#0d0d0d]">
+                          <img src={form.image3} alt="Preview" className="w-full h-16 object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-              <p className="text-[#555] text-[10px]">Additional gallery images. Same dimensions as cover recommended.</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-xs text-[#888] mb-1 block">Live URL</label>
-                  <input className="dash-input" value={form.liveUrl} onChange={(e) => setForm((f) => ({ ...f, liveUrl: e.target.value }))} placeholder="https://..." />
-                </div>
-                <div>
-                  <label className="text-xs text-[#888] mb-1 block">Repo URL</label>
-                  <input className="dash-input" value={form.repoUrl} onChange={(e) => setForm((f) => ({ ...f, repoUrl: e.target.value }))} placeholder="https://..." />
-                </div>
-              </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs text-[#888] mb-1 block">Live URL</label>
+                      <input className="dash-input" value={form.liveUrl} onChange={(e) => setForm((f) => ({ ...f, liveUrl: e.target.value }))} placeholder="https://..." />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#888] mb-1 block">Repo URL</label>
+                      <input className="dash-input" value={form.repoUrl} onChange={(e) => setForm((f) => ({ ...f, repoUrl: e.target.value }))} placeholder="https://..." />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {error && <p className="text-[#FE454E] text-xs mt-3">{error}</p>}
