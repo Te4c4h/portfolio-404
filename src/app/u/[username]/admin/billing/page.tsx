@@ -127,7 +127,7 @@ export default function BillingPage() {
             ) : (
               <div className="flex items-center gap-3 p-3 rounded-lg bg-[#FE454E]/5 border border-[#FE454E]/10">
                 <p className="text-xs text-[#ccc] flex-1">
-                  Are you sure? You'll keep access until {periodEnd || "the end of your billing period"}.
+                  Are you sure? You&apos;ll keep access until {periodEnd || "the end of your billing period"}.
                 </p>
                 <button
                   onClick={handleCancel}
@@ -183,7 +183,7 @@ export default function BillingPage() {
               <div>
                 <p className="text-sm text-[#fafafa] font-medium">Free Plan</p>
                 <p className="text-xs text-[#888] mt-0.5">
-                  You can build and edit your portfolio, but it won't be publicly visible until you subscribe.
+                  You can build and edit your portfolio, but it won&apos;t be publicly visible until you subscribe.
                 </p>
               </div>
             </div>
