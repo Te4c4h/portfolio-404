@@ -1,12 +1,11 @@
 "use client";
 
 import { Suspense, useState, useEffect, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 function CompleteSignupContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const email = searchParams.get("email") || "";
   const name = searchParams.get("name") || "";
 

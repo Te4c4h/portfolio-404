@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FiBarChart2,
   FiLayers,
-  FiGrid,
   FiFileText,
   FiLogOut,
   FiMenu,
