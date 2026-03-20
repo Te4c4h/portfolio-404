@@ -197,3 +197,22 @@ model ResumeSkill {
 
   resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
 }
+
+model PageView {
+  id        String   @id @default(cuid())
+  username  String
+  timestamp DateTime @default(now())
+  referrer  String?
+
+  @@index([username])
+  @@index([username, timestamp])
+}
+
+model ContactClick {
+  id          String   @id @default(cuid())
+  username    String
+  contactType String
+  timestamp   DateTime @default(now())
+
+  @@index([username])
+}

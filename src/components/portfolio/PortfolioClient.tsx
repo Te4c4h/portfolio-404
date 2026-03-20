@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoadingScreen from "./LoadingScreen";
 import CustomCursor from "./CustomCursor";
 import Navbar from "./Navbar";
@@ -119,6 +119,15 @@ export default function PortfolioClient({
 
   const [modalItem, setModalItem] = useState<ContentItemData | null>(null);
 
+  // Track page view on mount
+  useEffect(() => {
+    fetch("/api/analytics/view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: user.username, referrer: document.referrer || null }),
+    }).catch(() => {});
+  }, [user.username]);
+
   const firstSectionSlug = sections[0]?.slug || "";
   const ctaTarget1 = siteContent?.ctaTarget1 || (firstSectionSlug ? `#${firstSectionSlug}` : "#");
   const ctaTarget2 = siteContent?.ctaTarget2 || "#contact";
@@ -217,6 +226,7 @@ export default function PortfolioClient({
             subtitle={siteContent?.contactSubtitle || ""}
             links={contactLinks}
             accent={theme.accentColor}
+            username={user.username}
           />
           <Footer
             name={`${user.firstName} ${user.lastName}`}

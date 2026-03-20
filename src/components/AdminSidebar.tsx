@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FiHome,
+  FiBarChart2,
   FiLayers,
   FiGrid,
   FiFileText,
@@ -94,7 +94,7 @@ export default function AdminSidebar({ username, isAdmin, firstName, lastName }:
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        {/* Dashboard */}
+        {/* Analytics */}
         <Link
           href={basePath}
           onClick={() => setOpen(false)}
@@ -104,8 +104,8 @@ export default function AdminSidebar({ username, isAdmin, firstName, lastName }:
               : "text-[#888] hover:text-[#fafafa] hover:bg-[#ffffff08]"
           }`}
         >
-          <FiHome size={18} />
-          Dashboard
+          <FiBarChart2 size={18} />
+          Analytics
         </Link>
 
         {/* Portfolio Dropdown */}

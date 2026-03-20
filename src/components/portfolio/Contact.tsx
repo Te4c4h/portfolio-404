@@ -14,6 +14,7 @@ interface ContactProps {
   subtitle: string;
   links: ContactLinkData[];
   accent: string;
+  username?: string;
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -23,7 +24,15 @@ const iconMap: Record<string, React.ElementType> = {
   Fiverr: SiFiverr, Viber: FaViber, YouTube: FiYoutube, Other: FiGlobe,
 };
 
-export default function Contact({ title, subtitle, links, accent }: ContactProps) {
+export default function Contact({ title, subtitle, links, accent, username }: ContactProps) {
+  const trackClick = (platform: string) => {
+    if (!username) return;
+    fetch("/api/analytics/click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, contactType: platform }),
+    }).catch(() => {});
+  };
   return (
     <section id="contact" className="py-24 px-6">
       <div className="max-w-3xl mx-auto text-center">
@@ -58,6 +67,7 @@ export default function Contact({ title, subtitle, links, accent }: ContactProps
               <motion.a
                 key={link.id}
                 href={link.url}
+                onClick={() => trackClick(link.platform)}
                 {...(link.url.startsWith("mailto:") || link.url.startsWith("tel:") ? {} : { target: "_blank", rel: "noopener noreferrer" })}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
