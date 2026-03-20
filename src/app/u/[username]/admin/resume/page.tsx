@@ -64,9 +64,22 @@ export default function ResumePage() {
   const [toastMsg, setToastMsg] = useState("Resume saved!");
   const [downloading, setDownloading] = useState<string | null>(null);
 
+  const [error, setError] = useState<string | null>(null);
+
   const load = useCallback(async () => {
-    const r = await fetch("/api/resume");
-    if (r.ok) setResume(await r.json());
+    try {
+      const r = await fetch("/api/resume");
+      if (r.ok) {
+        setResume(await r.json());
+      } else {
+        const err = await r.text();
+        console.error("Resume load failed:", r.status, err);
+        setError(`Failed to load resume (${r.status})`);
+      }
+    } catch (e) {
+      console.error("Resume fetch error:", e);
+      setError("Network error loading resume");
+    }
     setLoading(false);
   }, []);
 
@@ -516,7 +529,7 @@ export default function ResumePage() {
   };
 
   if (loading) return <div className="text-[#888] text-sm">Loading...</div>;
-  if (!resume) return <div className="text-[#888] text-sm">Could not load resume.</div>;
+  if (!resume) return <div className="text-[#888] text-sm">{error || "Could not load resume."}</div>;
 
   return (
     <div className="max-w-3xl">

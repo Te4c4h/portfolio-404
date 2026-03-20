@@ -21,6 +21,7 @@ const features = [
 export default function PricingPage() {
   const { data: session } = useSession();
   const [checkingOut, setCheckingOut] = useState(false);
+  const lsEnabled = process.env.NEXT_PUBLIC_LEMONSQUEEZY_ENABLED === "true";
 
   const handleSubscribe = async () => {
     if (!session) return;
@@ -74,6 +75,24 @@ export default function PricingPage() {
         </div>
       </nav>
 
+      {!lsEnabled ? (
+        <div className="max-w-3xl mx-auto px-6 pt-32 pb-8 text-center">
+          <FiZap size={32} className="text-[#70E844] mx-auto mb-4" />
+          <h1 className="text-3xl font-bold tracking-tight text-[#fafafa] mb-3">
+            Pricing — Coming Soon
+          </h1>
+          <p className="text-[#888] text-lg max-w-md mx-auto mb-8">
+            We&apos;re finalizing our subscription plans. All features are currently free while we set things up.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex px-6 py-3 rounded-xl text-sm font-semibold bg-[#70E844] text-[#131313] hover:bg-[#5ed636] transition-colors"
+          >
+            Back to Home
+          </Link>
+        </div>
+      ) : (
+      <>
       {/* Hero */}
       <div className="max-w-3xl mx-auto px-6 pt-16 pb-8 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
@@ -143,6 +162,8 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

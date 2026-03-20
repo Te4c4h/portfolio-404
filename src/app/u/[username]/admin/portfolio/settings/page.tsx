@@ -309,10 +309,19 @@ export default function SettingsPage() {
               <button
                 onClick={async () => {
                   setDeleting(true);
-                  const r = await fetch("/api/user/account", { method: "DELETE" });
-                  if (r.ok) {
-                    await signOut({ callbackUrl: "/" });
-                  } else {
+                  try {
+                    const r = await fetch("/api/user/account", { method: "DELETE" });
+                    if (r.ok) {
+                      await signOut({ callbackUrl: "/" });
+                    } else {
+                      const err = await r.json().catch(() => ({}));
+                      alert(err.error || `Delete failed (${r.status})`);
+                      setDeleting(false);
+                      setDeleteModalOpen(false);
+                    }
+                  } catch (e) {
+                    console.error("Delete account error:", e);
+                    alert("Network error — please try again");
                     setDeleting(false);
                     setDeleteModalOpen(false);
                   }

@@ -174,8 +174,8 @@ export default function AdminSidebar({ username, isAdmin, firstName, lastName }:
           Resume
         </Link>
 
-        {/* Billing — non-admin only */}
-        {!isAdmin && (
+        {/* Billing — non-admin only, only when LemonSqueezy is enabled */}
+        {!isAdmin && process.env.NEXT_PUBLIC_LEMONSQUEEZY_ENABLED === "true" && (
           <Link
             href={basePath + "/billing"}
             onClick={() => setOpen(false)}

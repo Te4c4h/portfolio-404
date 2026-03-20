@@ -33,14 +33,16 @@ export default function UserAdminPage() {
       .catch(() => {});
   }, []);
 
+  const lsEnabled = process.env.NEXT_PUBLIC_LEMONSQUEEZY_ENABLED === "true";
+
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isAdmin && lsEnabled) {
       fetch("/api/subscription")
         .then((r) => r.json())
         .then(setSub)
         .catch(() => {});
     }
-  }, [isAdmin]);
+  }, [isAdmin, lsEnabled]);
 
   const handleSubscribe = async () => {
     setCheckingOut(true);
@@ -60,7 +62,7 @@ export default function UserAdminPage() {
       <h1 className="text-2xl font-bold text-[#fafafa] mb-6">Dashboard</h1>
 
       {/* Upgrade Banner */}
-      {!isAdmin && sub && !sub.hasAccess && (
+      {lsEnabled && !isAdmin && sub && !sub.hasAccess && (
         <div className="mb-6 bg-gradient-to-r from-[#70E844]/10 to-[#70E844]/5 border border-[#70E844]/20 rounded-xl p-5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1">

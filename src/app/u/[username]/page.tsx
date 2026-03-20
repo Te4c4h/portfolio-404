@@ -36,7 +36,6 @@ async function getPortfolioData(username: string) {
   });
 
   if (!user || user.isBlocked || !user.isPublished) return null;
-  if (user.subscriptionStatus !== "active" && !user.isFreeAccess) return null;
 
   // Fetch resume if showOnPortfolio is enabled
   const resume = await prisma.resume.findUnique({

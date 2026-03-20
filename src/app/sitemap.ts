@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { isSubscriptionEnabled } from "@/lib/subscription";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.portfolio404.site";
@@ -13,15 +14,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Published user portfolios
+  const where: Record<string, unknown> = {
+    isPublished: true,
+    isBlocked: false,
+  };
+
+  if (isSubscriptionEnabled()) {
+    where.OR = [
+      { subscriptionStatus: "active" },
+      { isFreeAccess: true },
+    ];
+  }
+
   const users = await prisma.user.findMany({
-    where: {
-      isPublished: true,
-      isBlocked: false,
-      OR: [
-        { subscriptionStatus: "active" },
-        { isFreeAccess: true },
-      ],
-    },
+    where,
     select: { username: true, registeredAt: true },
   });
 
